@@ -1,0 +1,13 @@
+{
+    "error": {
+     "errors": [
+      {
+       "domain": "calendar",
+       "reason": "forbiddenForNonOrganizer",
+       "message": "Shared properties can only be changed by the organizer of the event."
+      }
+     ],
+     "code": 403,
+     "message": "Shared properties can only be changed by the organizer of the event."
+    }
+   }

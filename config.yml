@@ -1,0 +1,8 @@
+SCOPES = ['https://www.googleapis.com/auth/calendar']
+SERVICE_ACCOUNT_FILE = 'service-account.json' # Provided by google
+SUBJECT = 'your bot id@adds-calendar-events.iam.gserviceaccount.com' #the bot
+JEN_WORK_ID = 'calendar id@group.calendar.google.com'
+PORT = 5050
+credentials = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+delegated_credentials = credentials.with_subject(SUBJECT) 
+service = build('calendar', 'v3', credentials=delegated_credentials)

@@ -1,0 +1,15 @@
+{
+    "error": {
+     "errors": [
+      {
+       "domain": "calendar",
+       "reason": "updatedMinTooLongAgo",
+       "message": "The requested minimum modification time lies too far in the past.",
+       "locationType": "parameter",
+       "location": "updatedMin"
+      }
+     ],
+     "code": 410,
+     "message": "The requested minimum modification time lies too far in the past."
+    }
+   }

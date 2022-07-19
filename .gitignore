@@ -1,0 +1,17 @@
+/**
+
+!*.py
+
+!/tests
+!/tests/google_errors/
+!/tests/google_errors/*.json
+
+
+!config.json
+!.gitignore
+!requirements.txt
+!service-account.json
+!target_calendar.json
+!config.yml
+
+quickstart.py
