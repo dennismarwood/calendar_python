@@ -10,8 +10,5 @@
 !config.json
 !.gitignore
 !requirements.txt
-!service-account.json
-!target_calendar.json
-!config.yml
 
 quickstart.py
