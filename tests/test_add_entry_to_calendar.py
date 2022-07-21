@@ -15,6 +15,7 @@ from googleapiclient.errors import HttpError
 #TODO All the errors that could be resoleved with exponential back should be tested with a 200 response.
 # However I am not sure how to get that working with the backoff mock being defined in SetUp() to keep code dry.
 
+@patch("add_entry_to_calendar.build")
 class TestAddEntry(unittest.TestCase):
 
     """  def test_invoke_json_bad_request(self):
@@ -28,18 +29,17 @@ class TestAddEntry(unittest.TestCase):
         }
         add_entry_to_calendar(bad_entry) """
 
-    #@patch("add_entry_to_calendar.build")
+    #
     #def test_json_401(self, mock_build):
 
         #pass
        
-    @patch("add_entry_to_calendar.build")
     def test_add_entry_to_calendar_200(self, _):
         self.assertEqual(add_entry_to_calendar({"Mock": "200"}), 200)
 
     # https://developers.google.com/calendar/api/guides/errors
     # Mock the build library of add_entry_to_calendar.py
-    @patch("add_entry_to_calendar.build")
+    
     def test_add_entry_to_calendar_400(self, mock_build): #mock_build is a MagicMock
         # The mock will be substituted whenever add_entry_to_calendar calls the "build" library
         self.e = None
@@ -60,7 +60,6 @@ class TestAddEntry(unittest.TestCase):
         self.assertEqual(add_entry_to_calendar({"Mock":"400"}), 400)
         #<HttpError 400 when requesting https://www.googleapis.com/calendar/v3/calendars/primary/events?alt=json returned "Ok">
 
-    @patch("add_entry_to_calendar.build")
     def test_add_entry_to_calendar_401(self, mock_build):
         self.e = None
         http = HttpMock('tests/google_errors/calendar_401.json', {'status': '401'})
@@ -74,7 +73,6 @@ class TestAddEntry(unittest.TestCase):
         mock_build.return_value.events.return_value.insert.return_value.execute.side_effect = self.e
         self.assertEqual(add_entry_to_calendar({"Mock":"401"}), 401)
     
-    @patch("add_entry_to_calendar.build")
     @patch("add_entry_to_calendar.sleep", return_value=None)
     def test_add_entry_to_calendar_403_userRateLimitExceeded(self, _, mock_build):
         self.e = None
@@ -89,7 +87,6 @@ class TestAddEntry(unittest.TestCase):
         mock_build.return_value.events.return_value.insert.return_value.execute.side_effect = [self.e, self.e, self.e, self.e, self.e]
         self.assertEqual(add_entry_to_calendar({"Mock":"403_userRateLimitExceeded"}), 403)
 
-    @patch("add_entry_to_calendar.build")
     @patch("add_entry_to_calendar.sleep", return_value=None)
     def test_add_entry_to_calendar_403_rateLimitExceeded(self, _, mock_build):
         self.e = None
@@ -104,8 +101,6 @@ class TestAddEntry(unittest.TestCase):
         mock_build.return_value.events.return_value.insert.return_value.execute.side_effect = self.e
         self.assertEqual(add_entry_to_calendar({"Mock":"403_rateLimitExceeded"}), 403)
     
-
-    @patch("add_entry_to_calendar.build")
     @patch("add_entry_to_calendar.backoff")
     def test_add_entry_to_calendar_200_after_rateLimitExceeded(self, mock_backoff, mock_build):
         #We will save the deepest stack return value
@@ -135,8 +130,7 @@ class TestAddEntry(unittest.TestCase):
             self.assertEqual(mock_backoff.call_count, 5)
             # After numerous reattempts we should get a 200
             self.assertEqual(self.ok, 200)
-
-    @patch("add_entry_to_calendar.build")
+    
     @patch("add_entry_to_calendar.sleep", return_value=None)
     def test_add_entry_to_calendar_403_quotaExceeded(self, _, mock_build):
         self.e = None
@@ -151,7 +145,6 @@ class TestAddEntry(unittest.TestCase):
         mock_build.return_value.events.return_value.insert.return_value.execute.side_effect = self.e
         self.assertEqual(add_entry_to_calendar({"Mock":"403_quotaExceeded"}), 403)
 
-    @patch("add_entry_to_calendar.build")
     def test_add_entry_to_calendar_403_forbiddenForNonOrganizer(self, mock_build):
         self.e = None
         http = HttpMock('tests/google_errors/calendar_403_forbiddenForNonOrganizer.json', {'status' : '403'})
@@ -165,7 +158,6 @@ class TestAddEntry(unittest.TestCase):
         mock_build.return_value.events.return_value.insert.return_value.execute.side_effect = self.e
         self.assertEqual(add_entry_to_calendar({"Mock":"403_forbiddenForNonOrganizer"}), 403)
 
-    @patch("add_entry_to_calendar.build")
     @patch("add_entry_to_calendar.sleep", return_value=None)
     def test_add_entry_to_calendar_404_notFound(self, _, mock_build):
         self.e = None
@@ -180,7 +172,6 @@ class TestAddEntry(unittest.TestCase):
         mock_build.return_value.events.return_value.insert.return_value.execute.side_effect = self.e
         self.assertEqual(add_entry_to_calendar({"Mock":"404"}), 404)
 
-    @patch("add_entry_to_calendar.build")
     def test_add_entry_to_calendar_409(self, mock_build):
         self.e = None
         http = HttpMock('tests/google_errors/calendar_409.json', {'status' : '409'})
@@ -194,7 +185,6 @@ class TestAddEntry(unittest.TestCase):
         mock_build.return_value.events.return_value.insert.return_value.execute.side_effect = self.e
         self.assertEqual(add_entry_to_calendar({"Mock":"409"}), 409)
 
-    @patch("add_entry_to_calendar.build")
     def test_add_entry_to_calendar_410_fullSyncRequired(self, mock_build):
         self.e = None
         http = HttpMock('tests/google_errors/calendar_410_fullSyncRequired.json', {'status' : '409'})
@@ -208,7 +198,6 @@ class TestAddEntry(unittest.TestCase):
         mock_build.return_value.events.return_value.insert.return_value.execute.side_effect = self.e
         self.assertEqual(add_entry_to_calendar({"Mock":"410_fullSyncRequired"}), 410)
 
-    @patch("add_entry_to_calendar.build")
     def test_add_entry_to_calendar_410_updatedMinTooLongAgo(self, mock_build):
         self.e = None
         http = HttpMock('tests/google_errors/calendar_410_updatedMinTooLongAgo.json', {'status' : '410'})
@@ -222,7 +211,6 @@ class TestAddEntry(unittest.TestCase):
         mock_build.return_value.events.return_value.insert.return_value.execute.side_effect = self.e
         self.assertEqual(add_entry_to_calendar({"Mock":"410"}), 410)
 
-    @patch("add_entry_to_calendar.build")
     def test_add_entry_to_calendar_410_deleted(self, mock_build):
         self.e = None
         http = HttpMock('tests/google_errors/calendar_410_deleted.json', {'status' : '410'})
@@ -236,7 +224,6 @@ class TestAddEntry(unittest.TestCase):
         mock_build.return_value.events.return_value.insert.return_value.execute.side_effect = self.e
         self.assertEqual(add_entry_to_calendar({"Mock":"410"}), 410)
 
-    @patch("add_entry_to_calendar.build")
     @patch("add_entry_to_calendar.sleep", return_value=None)
     def test_add_entry_to_calendar_412(self, _, mock_build):
         self.e = None
@@ -251,7 +238,6 @@ class TestAddEntry(unittest.TestCase):
         mock_build.return_value.events.return_value.insert.return_value.execute.side_effect = self.e
         self.assertEqual(add_entry_to_calendar({"Mock":"412"}), 412)
 
-    @patch("add_entry_to_calendar.build")
     @patch("add_entry_to_calendar.sleep", return_value=None)
     def test_add_entry_to_calendar_429(self, _, mock_build):
         self.e = None
@@ -266,7 +252,6 @@ class TestAddEntry(unittest.TestCase):
         mock_build.return_value.events.return_value.insert.return_value.execute.side_effect = self.e
         self.assertEqual(add_entry_to_calendar({"Mock":"429"}), 429)
 
-    @patch("add_entry_to_calendar.build")
     @patch("add_entry_to_calendar.sleep", return_value=None)
     def test_add_entry_to_calendar_500(self, _, mock_build):
         self.e = None
@@ -281,7 +266,6 @@ class TestAddEntry(unittest.TestCase):
         mock_build.return_value.events.return_value.insert.return_value.execute.side_effect = self.e
         self.assertEqual(add_entry_to_calendar({"Mock":"500"}), 500)
  
-    @patch("add_entry_to_calendar.build")
     def test_add_entry_to_calendar_any_exception(self, mock_build):
         mock_build.return_value.events.return_value\
         .insert.return_value.execute.side_effect = Exception()

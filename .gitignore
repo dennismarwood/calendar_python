@@ -10,5 +10,6 @@
 !config.json
 !.gitignore
 !requirements.txt
- 
+!README.md
+
 quickstart.py
